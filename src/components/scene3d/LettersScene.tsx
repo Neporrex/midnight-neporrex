@@ -72,12 +72,12 @@ export function LettersScene() {
   useFrame(() => {
     if (!groupRef.current) return;
     const p = scrollState.progress;
-    const visibility = smoothstep(0.5, 0.58, p) * (1 - smoothstep(0.7, 0.77, p));
+    const visibility = smoothstep(0.48, 0.54, p) * (1 - smoothstep(0.64, 0.69, p));
     groupRef.current.visible = visibility > 0.001;
   });
 
   return (
-    <group ref={groupRef} position={[0, 0, -80]}>
+    <group ref={groupRef} position={[0, 0, -120]}>
       {letters.map((l, i) => (
         <SwirlingLetter key={i} letter={l} index={i} />
       ))}

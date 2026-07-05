@@ -77,18 +77,14 @@ export function Navbar() {
             </a>
           ))}
         </div>
-        <div
-          className="flex items-center gap-2 px-2.5 py-1"
-          style={{
-            background: '#2A9D8F',
-            border: '2px solid #1A1A1A',
-          }}
-        >
-          <span
-            className="w-1.5 h-1.5 animate-flicker"
-            style={{ background: '#1A1A1A' }}
-          />
-          <span className="font-mono-raw text-[10px] font-bold tracking-wider">ONLINE</span>
+        <div className="md:hidden">
+          <a
+            href="#contact"
+            className="font-mono-raw text-xs tracking-wider px-2 py-1"
+            style={{ border: '2px solid #1A1A1A' }}
+          >
+            MENU
+          </a>
         </div>
       </div>
       <div

@@ -5,7 +5,9 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { TitleScene } from './TitleScene';
 import { GridScene } from './GridScene';
+import { BeaconScene } from './BeaconScene';
 import { LettersScene } from './LettersScene';
+import { ArchiveScene } from './ArchiveScene';
 import { DropScene } from './DropScene';
 import { StormScene } from './StormScene';
 import { scrollState, SCENE_Z_POSITIONS, lerp, smoothstep } from '@/lib/scroll-state';
@@ -13,26 +15,25 @@ import { stormState, triggerLightning, decayFlash } from '@/lib/storm-state';
 
 const BONE = '#F5F1E8';
 const STORM_BG = '#D4D8DC';
+const ARCHIVE_BG = '#0E1414';
+const SEGMENT = 1 / 6;
+
+function cameraZForProgress(p: number): number {
+  const startOffset = 8;
+  if (p < SEGMENT) {
+    return lerp(SCENE_Z_POSITIONS[0] + startOffset, SCENE_Z_POSITIONS[0] - 2, p / SEGMENT);
+  }
+  const seg = Math.min(5, Math.floor(p / SEGMENT));
+  const local = (p - seg * SEGMENT) / SEGMENT;
+  return lerp(SCENE_Z_POSITIONS[seg - 1] - 2, SCENE_Z_POSITIONS[seg] - 2, local);
+}
 
 function CameraRig() {
   const targetZ = useRef(0);
 
   useFrame((state, delta) => {
     const p = scrollState.progress;
-    let z: number;
-    if (p < 0.25) {
-      z = lerp(SCENE_Z_POSITIONS[0] + 8, SCENE_Z_POSITIONS[0] - 4, p / 0.25);
-    } else if (p < 0.5) {
-      const local = (p - 0.25) / 0.25;
-      z = lerp(SCENE_Z_POSITIONS[0] - 4, SCENE_Z_POSITIONS[1] - 2, local);
-    } else if (p < 0.75) {
-      const local = (p - 0.5) / 0.25;
-      z = lerp(SCENE_Z_POSITIONS[1] - 2, SCENE_Z_POSITIONS[2] - 2, local);
-    } else {
-      const local = (p - 0.75) / 0.25;
-      z = lerp(SCENE_Z_POSITIONS[2] - 2, SCENE_Z_POSITIONS[3] - 2, local);
-    }
-    targetZ.current = z;
+    targetZ.current = cameraZForProgress(p);
     const cam = state.camera;
     cam.position.z = THREE.MathUtils.lerp(cam.position.z, targetZ.current, 0.18);
     const windSwayX = Math.sin(state.clock.elapsedTime * 0.6) * 0.4;
@@ -56,21 +57,22 @@ function FogRig() {
     };
   }, [scene]);
 
-  const fogRef = useRef<THREE.Fog | null>(null);
   useFrame(() => {
     if (!scene.fog || !(scene.fog instanceof THREE.Fog)) return;
     const p = scrollState.progress;
-    const storminess = smoothstep(0.18, 0.42, p) * (1 - smoothstep(0.6, 0.78, p));
+    const storminess = smoothstep(0.18, 0.36, p) * (1 - smoothstep(0.45, 0.52, p));
+    const archiveDark = smoothstep(0.72, 0.82, p) * (1 - smoothstep(0.94, 1.0, p));
     const baseColor = new THREE.Color(BONE);
     const stormColor = new THREE.Color(STORM_BG);
-    const c = baseColor.clone().lerp(stormColor, storminess * 0.7);
+    const archiveColor = new THREE.Color(ARCHIVE_BG);
+    let c = baseColor.clone().lerp(stormColor, storminess * 0.75);
+    c = c.lerp(archiveColor, archiveDark * 0.6);
     scene.fog.color = c;
     if (scene.background instanceof THREE.Color) {
       scene.background.copy(c);
     }
-    scene.fog.near = 22 - storminess * 8;
-    scene.fog.far = 65 - storminess * 15;
-    fogRef.current = scene.fog;
+    scene.fog.near = 22 - storminess * 8 - archiveDark * 6;
+    scene.fog.far = 65 - storminess * 15 - archiveDark * 20;
   });
 
   return null;
@@ -80,7 +82,7 @@ function StormTrigger() {
   const lastStrikeRef = useRef(0);
   useFrame((state) => {
     const p = scrollState.progress;
-    const storminess = smoothstep(0.18, 0.42, p) * (1 - smoothstep(0.6, 0.78, p));
+    const storminess = smoothstep(0.18, 0.36, p) * (1 - smoothstep(0.45, 0.52, p));
     if (storminess < 0.1) return;
     const t = state.clock.elapsedTime;
     const interval = 1.8 - storminess * 0.8;
@@ -109,7 +111,7 @@ export function Scene3DCanvas() {
         position: [0, 0, 8],
         fov: 70,
         near: 0.1,
-        far: 200,
+        far: 220,
       }}
       gl={{
         antialias: true,
@@ -124,7 +126,9 @@ export function Scene3DCanvas() {
       <Suspense fallback={null}>
         <TitleScene />
         <GridScene />
+        <BeaconScene />
         <LettersScene />
+        <ArchiveScene />
         <DropScene />
         <StormScene />
       </Suspense>

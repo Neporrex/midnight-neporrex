@@ -10,17 +10,16 @@ export const scrollState = {
   sceneIndex: 0,
 };
 
-export const SCENE_COUNT = 4;
+export const SCENE_COUNT = 6;
 
-export const SCENE_Z_POSITIONS = [0, -40, -80, -120];
+export const SCENE_Z_POSITIONS = [0, -40, -80, -120, -160, -200];
 
-export const TOTAL_SCROLL_Z = -160;
+export const TOTAL_SCROLL_Z = -240;
 
 export function getSceneFromProgress(progress: number): number {
-  if (progress < 0.25) return 0;
-  if (progress < 0.5) return 1;
-  if (progress < 0.75) return 2;
-  return 3;
+  const n = SCENE_COUNT;
+  const idx = Math.min(n - 1, Math.floor(progress * n));
+  return Math.max(0, idx);
 }
 
 export function lerp(a: number, b: number, t: number): number {

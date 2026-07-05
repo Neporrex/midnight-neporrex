@@ -163,7 +163,7 @@ export function StormScene() {
   useFrame(() => {
     if (!groupRef.current) return;
     const p = scrollState.progress;
-    const storminess = smoothstep(0.18, 0.42, p) * (1 - smoothstep(0.6, 0.78, p));
+    const storminess = smoothstep(0.16, 0.30, p) * (1 - smoothstep(0.33, 0.38, p));
     groupRef.current.visible = storminess > 0.05;
     groupRef.current.children.forEach((child) => {
       child.traverse((c) => {

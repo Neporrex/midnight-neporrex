@@ -9,6 +9,9 @@ import { stormState } from '@/lib/storm-state';
 
 const FONT_URL = '/fonts/helvetiker_bold.typeface.json';
 
+const SCENE_START = 0.0;
+const SCENE_END = 0.18;
+
 export function TitleScene() {
   const groupRef = useRef<THREE.Group>(null);
   const textGroupRef = useRef<THREE.Group>(null);
@@ -18,27 +21,27 @@ export function TitleScene() {
   useFrame((state) => {
     if (!groupRef.current || !textGroupRef.current) return;
     const p = scrollState.progress;
-    const visibility = 1 - smoothstep(0.18, 0.26, p);
+    const visibility = 1 - smoothstep(SCENE_END - 0.04, SCENE_END + 0.04, p);
     groupRef.current.visible = visibility > 0.001;
-    const rotY = (p - 0.05) * Math.PI * 10;
+    const rotY = (p / SCENE_END) * Math.PI * 0.8;
     textGroupRef.current.rotation.y = rotY;
-    const scale = 1 + smoothstep(0.0, 0.1, p) * 0.4 - smoothstep(0.15, 0.26, p) * 0.5;
-    textGroupRef.current.scale.setScalar(Math.max(0.3, scale));
+    const scale = 1 - smoothstep(SCENE_END - 0.06, SCENE_END + 0.04, p) * 0.4;
+    textGroupRef.current.scale.setScalar(Math.max(0.4, scale));
 
     const firePulse = stormState.flashIntensity;
     if (fireTextRef.current) {
-      const targetScale = 0.6 + firePulse * 0.8;
+      const targetScale = 0.7 + firePulse * 0.5;
       fireTextRef.current.scale.setScalar(
         THREE.MathUtils.lerp(fireTextRef.current.scale.x, targetScale, 0.2)
       );
-      const targetY = -3 + firePulse * 0.6;
+      const targetY = -2.5 + firePulse * 0.4;
       fireTextRef.current.position.y = THREE.MathUtils.lerp(
         fireTextRef.current.position.y,
         targetY,
         0.15
       );
-      fireTextRef.current.visible = firePulse > 0.02 || p < 0.18;
-      fireTextRef.current.rotation.y = Math.sin(state.clock.elapsedTime * 0.8) * 0.15;
+      fireTextRef.current.visible = firePulse > 0.02 || p < SCENE_END;
+      fireTextRef.current.rotation.y = Math.sin(state.clock.elapsedTime * 0.8) * 0.1;
     }
     if (flashMatRef.current) {
       flashMatRef.current.opacity = 0.7 + firePulse * 0.3;
@@ -47,64 +50,89 @@ export function TitleScene() {
 
   return (
     <group ref={groupRef} position={[0, 0, 0]}>
-      <group ref={textGroupRef}>
+      <group ref={textGroupRef} position={[0, 0.6, 0]}>
         <Center>
           <Text3D
             font={FONT_URL}
-            size={1.4}
-            height={0.45}
+            size={0.9}
+            height={0.3}
             curveSegments={6}
             bevelEnabled
-            bevelThickness={0.06}
-            bevelSize={0.03}
+            bevelThickness={0.04}
+            bevelSize={0.02}
             bevelSegments={2}
           >
-            THE MANIFESTO
+            MANIFESTO
             <meshBasicMaterial color="#1A1A1A" />
           </Text3D>
         </Center>
       </group>
 
-      <group ref={fireTextRef} position={[0, -3, 1]} visible={false}>
+      <group position={[0, 1.7, 0]}>
         <Text
-          fontSize={0.85}
+          fontSize={0.22}
+          color="#1D3557"
           anchorX="center"
           anchorY="middle"
-          outlineWidth={0.04}
+          maxWidth={14}
+          textAlign="center"
+        >
+          a scroll-driven storm by neporrex_
+        </Text>
+      </group>
+
+      <group ref={fireTextRef} position={[0, -2.5, 1]} visible={false}>
+        <Text
+          fontSize={0.55}
+          anchorX="center"
+          anchorY="middle"
+          outlineWidth={0.025}
           outlineColor="#1A1A1A"
         >
           FIRED BY THE STORM
           <meshBasicMaterial ref={flashMatRef} color="#E76F51" transparent opacity={0.85} />
         </Text>
-        <mesh position={[0, -0.5, -0.2]}>
-          <boxGeometry args={[6, 0.08, 0.08]} />
+        <mesh position={[0, -0.4, -0.2]}>
+          <boxGeometry args={[4.5, 0.06, 0.06]} />
           <meshBasicMaterial color="#F4A261" />
         </mesh>
-        <mesh position={[-3.2, 0, -0.2]}>
-          <boxGeometry args={[0.15, 0.6, 0.15]} />
+        <mesh position={[-2.4, 0, -0.2]}>
+          <boxGeometry args={[0.1, 0.4, 0.1]} />
           <meshBasicMaterial color="#E63946" />
         </mesh>
-        <mesh position={[3.2, 0, -0.2]}>
-          <boxGeometry args={[0.15, 0.6, 0.15]} />
+        <mesh position={[2.4, 0, -0.2]}>
+          <boxGeometry args={[0.1, 0.4, 0.1]} />
           <meshBasicMaterial color="#E63946" />
         </mesh>
       </group>
 
-      <mesh position={[0, 3, 0]}>
-        <boxGeometry args={[14, 0.12, 0.12]} />
+      <mesh position={[0, 3.4, 0]}>
+        <boxGeometry args={[10, 0.08, 0.08]} />
         <meshBasicMaterial color="#1D3557" />
       </mesh>
-      <mesh position={[0, -2.6, 0]}>
-        <boxGeometry args={[14, 0.12, 0.12]} />
+      <mesh position={[0, -3.4, 0]}>
+        <boxGeometry args={[10, 0.08, 0.08]} />
         <meshBasicMaterial color="#2A9D8F" />
       </mesh>
-      <mesh position={[-3.5, 0, -1]}>
-        <boxGeometry args={[0.9, 0.9, 0.9]} />
+      <mesh position={[-4.5, 0, -2]}>
+        <boxGeometry args={[0.6, 0.6, 0.6]} />
         <meshBasicMaterial color="#E76F51" />
       </mesh>
-      <mesh position={[3.5, 0, -1]}>
-        <boxGeometry args={[0.9, 0.9, 0.9]} />
+      <mesh position={[4.5, 0, -2]}>
+        <boxGeometry args={[0.6, 0.6, 0.6]} />
         <meshBasicMaterial color="#1D3557" />
+      </mesh>
+      <mesh position={[-3, 2, -1.5]} rotation={[0.4, 0.5, 0]}>
+        <boxGeometry args={[0.4, 0.4, 0.4]} />
+        <meshBasicMaterial color="#F4A261" />
+      </mesh>
+      <mesh position={[3, -2, -1.5]} rotation={[0.4, -0.3, 0]}>
+        <boxGeometry args={[0.4, 0.4, 0.4]} />
+        <meshBasicMaterial color="#2A9D8F" />
+      </mesh>
+      <mesh position={[0, -1.6, -3]} rotation={[0, 0.3, 0]}>
+        <boxGeometry args={[1.2, 1.2, 1.2]} />
+        <meshBasicMaterial color="#E76F51" wireframe />
       </mesh>
     </group>
   );

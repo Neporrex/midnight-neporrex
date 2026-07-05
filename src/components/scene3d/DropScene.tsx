@@ -13,9 +13,9 @@ export function DropScene() {
   useFrame(() => {
     if (!groupRef.current || !cubeRef.current || !cube2Ref.current) return;
     const p = scrollState.progress;
-    const visibility = smoothstep(0.72, 0.78, p);
+    const visibility = smoothstep(0.82, 0.86, p);
     groupRef.current.visible = visibility > 0.001;
-    const grow = smoothstep(0.74, 0.97, p);
+    const grow = smoothstep(0.84, 0.99, p);
     const scale = 0.5 + grow * 30;
     cubeRef.current.scale.setScalar(scale);
     cubeRef.current.rotation.x = grow * Math.PI * 0.5;
@@ -27,7 +27,7 @@ export function DropScene() {
   });
 
   return (
-    <group ref={groupRef} position={[0, 0, -120]}>
+    <group ref={groupRef} position={[0, 0, -200]}>
       <mesh ref={cubeRef} position={[0, 0, 0]}>
         <boxGeometry args={[1, 1, 1]} />
         <meshBasicMaterial color="#1A1A1A" />

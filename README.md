@@ -2,22 +2,26 @@
 
 > A scroll-driven 3D manifesto. Storm included. Built loud on a broken white background, with no apologies.
 
-This is my take on the cinematic scroll-jacking thing SBS did with "The Boat", but stripped down and rebuilt with a stormy twist. Black ink on bone. Hard edges. No gradients. No rounded corners. A camera flies forward through four scenes while you scroll, the sky breaks open, lightning fires the text, and the cubes bend with the wind.
+This is my take on the cinematic scroll-jacking thing SBS did with "The Boat", but stripped down and rebuilt with a stormy twist. Black ink on bone. Hard edges. No gradients. No rounded corners. A camera flies forward through six scenes while you scroll, the sky breaks open, lightning fires the text, a lighthouse beam sweeps the dark, code rain falls in the archive, and the cubes bend with the wind.
 
 ## what it is
 
 A single-page Next.js site where:
 
-- The 3D canvas is pinned to the viewport (position fixed) while a 500vh virtual scroll container does the work underneath.
+- An epileptic warning overlay locks the page on first visit. Visitors accept or leave. The choice is remembered for the session.
+- The 3D canvas is pinned to the viewport (position fixed) while a 700vh virtual scroll container does the work underneath.
 - GSAP ScrollTrigger maps scroll progress (0 to 1) to the camera's Z position. The camera flies forward through a long corridor.
-- Four scenes are stacked along the Z axis:
-  1. **THE TITLE** - extruded 3D text that rotates harshly on Y as you scroll. When lightning strikes, a "FIRED BY THE STORM" text rises up beneath it.
+- Six scenes are stacked along the Z axis:
+  1. **THE TITLE** - smaller, readable extruded 3D "MANIFESTO" text with floating cubes and accent bars. When lightning strikes elsewhere, a "FIRED BY THE STORM" text rises up beneath it.
   2. **THE STORM** - a wireframe water floor with waves, a wireframe ceiling, and cubes/spheres that get pushed around by wind. Storm clouds roll in, rain falls diagonally, lightning bolts crack open the sky, and a full-screen flash fires the text.
-  3. **RAW CREATION** - a glassmorphism brutalist panel slides in from the right while monospace letters swirl around in the 3D background.
-  4. **THE DROP** - a giant black cube scales up to swallow the screen, then hands off to the contact footer.
-- The navbar auto-hides when you scroll down and snaps back when you scroll up.
-- A thin gradient scroll progress bar on the right replaces the old chunky block.
+  3. **THE BEACON** (new) - a wireframe lighthouse tower with a rotating spotlight beam. Cubes orbit around it and only light up when the beam sweeps over them. Two ring guides on the floor.
+  4. **RAW CREATION** - a glassmorphism brutalist panel slides in from the right while monospace letters swirl around in the 3D background.
+  5. **THE ARCHIVE** (new) - matrix-style code rain. Vertical streams of glyphs fall and shuffle, with a typewriter quote that types and loops. Background shifts toward deep archive black.
+  6. **THE DROP** - a giant black cube scales up to swallow the screen, then hands off to the contact footer.
+- The navbar auto-hides when you scroll down and snaps back when you scroll up. The old "ONLINE" pill is gone.
+- A thin gradient scroll progress bar on the right.
 - Retro scanlines and a film grain overlay sit on top of everything for a vintage feel.
+- Two human touches: a "NOW BUILDING" widget bottom-left that cycles through projects I am currently working on, and a "THOUGHT" ticker at the very bottom that rotates through short opinions about code.
 
 ## the stack
 
@@ -88,19 +92,24 @@ src/
     page.tsx            # the whole composition: canvas + scroll container + overlays
   components/
     scene3d/
-      Scene3DCanvas.tsx # the pinned R3F Canvas, fog rig, camera rig, storm trigger
+      Scene3DCanvas.tsx # the pinned R3F Canvas, fog rig, camera rig (6 scenes), storm trigger
       ScrollSetup.tsx   # GSAP ScrollTrigger glue
       TitleScene.tsx    # scene 1: extruded 3D text + fire text reveal
       GridScene.tsx     # scene 2: water floor + wind-blown cubes
       StormScene.tsx    # clouds, lightning bolts, rain particles, storm light
-      LettersScene.tsx  # scene 3: swirling monospace letters
-      DropScene.tsx     # scene 4: the giant scaling cube
+      BeaconScene.tsx   # scene 3: lighthouse tower + rotating spotlight beam + swept cubes
+      LettersScene.tsx  # scene 4: swirling monospace letters
+      ArchiveScene.tsx  # scene 5: matrix code rain + typewriter quote
+      DropScene.tsx     # scene 6: the giant scaling cube
     ui-overlay/
       Navbar.tsx        # glassmorphism, auto-hide on scroll
       ScrollProgress.tsx# thin gradient bar
       StickyPanel.tsx   # the glass "RAW CREATION" card
       ContactFooter.tsx # bio + stack + socials
       LightningOverlay.tsx # the HTML flash overlay
+      EpilepticWarning.tsx # the seizure warning gate
+      NowBuilding.tsx   # bottom-left widget, cycles through current projects
+      ThoughtTicker.tsx # bottom ticker, rotates through short opinions
       Overlays.tsx      # retro scanlines + film grain
   lib/
     scroll-state.ts     # the shared mutable scroll object + helpers

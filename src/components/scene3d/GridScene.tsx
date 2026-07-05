@@ -144,9 +144,9 @@ export function GridScene() {
   useFrame((state, delta) => {
     if (!groupRef.current) return;
     const p = scrollState.progress;
-    const visibility = smoothstep(0.22, 0.3, p) * (1 - smoothstep(0.46, 0.52, p));
+    const visibility = smoothstep(0.15, 0.19, p) * (1 - smoothstep(0.31, 0.36, p));
     groupRef.current.visible = visibility > 0.001;
-    const target = smoothstep(0.22, 0.42, p);
+    const target = smoothstep(0.15, 0.30, p);
     stormRef.current = THREE.MathUtils.lerp(stormRef.current, target, delta * 1.5);
   });
 

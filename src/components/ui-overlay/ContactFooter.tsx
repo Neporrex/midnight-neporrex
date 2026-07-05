@@ -142,6 +142,7 @@ export function ContactFooter() {
           <div className="font-mono-raw text-[10px] opacity-60 md:text-right">
             <div>{new Date().getFullYear()} / all rights reserved</div>
             <div>scroll back up to replay the storm.</div>
+            <div style={{ marginTop: 4, color: '#E76F51', opacity: 0.8 }}>six scenes. one long corridor. stay safe.</div>
           </div>
         </div>
       </div>
