@@ -53,7 +53,7 @@ export function LettersScene() {
 
   const letters = useMemo<Letter[]>(() => {
     const arr: Letter[] = [];
-    const colors = ['#000000', '#FF3131', '#0000FF', '#000000', '#000000', '#000000'];
+    const colors = ['#1A1A1A', '#E76F51', '#1D3557', '#2A9D8F', '#1A1A1A', '#F4A261'];
     for (let i = 0; i < 60; i++) {
       arr.push({
         char: LETTERS[Math.floor(Math.random() * LETTERS.length)],

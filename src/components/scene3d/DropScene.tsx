@@ -30,15 +30,15 @@ export function DropScene() {
     <group ref={groupRef} position={[0, 0, -120]}>
       <mesh ref={cubeRef} position={[0, 0, 0]}>
         <boxGeometry args={[1, 1, 1]} />
-        <meshBasicMaterial color="#000000" />
+        <meshBasicMaterial color="#1A1A1A" />
       </mesh>
       <mesh ref={cube2Ref} position={[2.5, -1.5, 2]}>
         <boxGeometry args={[1, 1, 1]} />
-        <meshBasicMaterial color="#FF3131" />
+        <meshBasicMaterial color="#E76F51" />
       </mesh>
       <mesh position={[0, 0, 8]}>
         <boxGeometry args={[0.6, 0.6, 0.6]} />
-        <meshBasicMaterial color="#0000FF" />
+        <meshBasicMaterial color="#1D3557" />
       </mesh>
     </group>
   );

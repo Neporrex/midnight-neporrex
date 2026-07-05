@@ -7,14 +7,17 @@ import { TitleScene } from './TitleScene';
 import { GridScene } from './GridScene';
 import { LettersScene } from './LettersScene';
 import { DropScene } from './DropScene';
-import { scrollState, SCENE_Z_POSITIONS, lerp } from '@/lib/scroll-state';
+import { StormScene } from './StormScene';
+import { scrollState, SCENE_Z_POSITIONS, lerp, smoothstep } from '@/lib/scroll-state';
+import { stormState, triggerLightning, decayFlash } from '@/lib/storm-state';
 
-const BROKEN_WHITE = '#F2F0E9';
+const BONE = '#F5F1E8';
+const STORM_BG = '#D4D8DC';
 
 function CameraRig() {
   const targetZ = useRef(0);
 
-  useFrame((state) => {
+  useFrame((state, delta) => {
     const p = scrollState.progress;
     let z: number;
     if (p < 0.25) {
@@ -32,9 +35,12 @@ function CameraRig() {
     targetZ.current = z;
     const cam = state.camera;
     cam.position.z = THREE.MathUtils.lerp(cam.position.z, targetZ.current, 0.18);
-    cam.position.x = THREE.MathUtils.lerp(cam.position.x, Math.sin(p * Math.PI * 2) * 0.6, 0.1);
-    cam.position.y = THREE.MathUtils.lerp(cam.position.y, Math.cos(p * Math.PI * 3) * 0.4, 0.1);
+    const windSwayX = Math.sin(state.clock.elapsedTime * 0.6) * 0.4;
+    const windSwayY = Math.cos(state.clock.elapsedTime * 0.4) * 0.25;
+    cam.position.x = THREE.MathUtils.lerp(cam.position.x, windSwayX + Math.sin(p * Math.PI * 2) * 0.4, 0.08);
+    cam.position.y = THREE.MathUtils.lerp(cam.position.y, windSwayY + Math.cos(p * Math.PI * 3) * 0.3, 0.08);
     cam.lookAt(0, 0, cam.position.z - 5);
+    decayFlash(delta);
   });
 
   return null;
@@ -43,9 +49,47 @@ function CameraRig() {
 function FogRig() {
   const scene = useThree((state) => state.scene);
   useEffect(() => {
-    scene.fog = new THREE.Fog(BROKEN_WHITE, 25, 70);
-    scene.background = new THREE.Color(BROKEN_WHITE);
+    scene.fog = new THREE.Fog(BONE, 22, 65);
+    scene.background = new THREE.Color(BONE);
+    return () => {
+      scene.fog = null;
+    };
   }, [scene]);
+
+  const fogRef = useRef<THREE.Fog | null>(null);
+  useFrame(() => {
+    if (!scene.fog || !(scene.fog instanceof THREE.Fog)) return;
+    const p = scrollState.progress;
+    const storminess = smoothstep(0.18, 0.42, p) * (1 - smoothstep(0.6, 0.78, p));
+    const baseColor = new THREE.Color(BONE);
+    const stormColor = new THREE.Color(STORM_BG);
+    const c = baseColor.clone().lerp(stormColor, storminess * 0.7);
+    scene.fog.color = c;
+    if (scene.background instanceof THREE.Color) {
+      scene.background.copy(c);
+    }
+    scene.fog.near = 22 - storminess * 8;
+    scene.fog.far = 65 - storminess * 15;
+    fogRef.current = scene.fog;
+  });
+
+  return null;
+}
+
+function StormTrigger() {
+  const lastStrikeRef = useRef(0);
+  useFrame((state) => {
+    const p = scrollState.progress;
+    const storminess = smoothstep(0.18, 0.42, p) * (1 - smoothstep(0.6, 0.78, p));
+    if (storminess < 0.1) return;
+    const t = state.clock.elapsedTime;
+    const interval = 1.8 - storminess * 0.8;
+    const jitter = Math.sin(t * 7.3) * 0.3 + Math.cos(t * 3.1) * 0.4;
+    if (t - lastStrikeRef.current > interval + jitter) {
+      lastStrikeRef.current = t;
+      triggerLightning(0.9 + storminess * 0.1);
+    }
+  });
   return null;
 }
 
@@ -59,7 +103,7 @@ export function Scene3DCanvas() {
         width: '100vw',
         height: '100vh',
         zIndex: 1,
-        background: BROKEN_WHITE,
+        background: BONE,
       }}
       camera={{
         position: [0, 0, 8],
@@ -75,12 +119,14 @@ export function Scene3DCanvas() {
     >
       <FogRig />
       <CameraRig />
+      <StormTrigger />
       <ambientLight intensity={1} />
       <Suspense fallback={null}>
         <TitleScene />
         <GridScene />
         <LettersScene />
         <DropScene />
+        <StormScene />
       </Suspense>
     </Canvas>
   );

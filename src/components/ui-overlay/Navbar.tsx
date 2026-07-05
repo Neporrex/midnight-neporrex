@@ -1,68 +1,103 @@
 'use client';
 
+import { useEffect, useState } from 'react';
+
 export function Navbar() {
+  const [hidden, setHidden] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    let lastY = 0;
+    let ticking = false;
+    const onScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const y = window.scrollY;
+          setScrolled(y > 40);
+          if (y > lastY && y > 200) {
+            setHidden(true);
+          } else {
+            setHidden(false);
+          }
+          lastY = y;
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
   return (
     <nav
-      className="fixed top-0 left-0 w-full z-50 brutalist-border"
+      className="fixed top-0 left-0 w-full z-50 transition-transform duration-300"
       style={{
-        borderBottomWidth: '4px',
-        background: '#F2F0E9',
+        transform: hidden ? 'translateY(-100%)' : 'translateY(0)',
+        borderBottom: '2px solid #1A1A1A',
+        background: 'rgba(245, 241, 232, 0.7)',
+        backdropFilter: 'blur(14px) saturate(140%)',
+        WebkitBackdropFilter: 'blur(14px) saturate(140%)',
       }}
     >
-      <div className="flex items-center justify-between px-6 py-4">
-        <div className="flex items-center gap-3">
+      <div className="flex items-center justify-between px-6 py-3">
+        <a href="#top" className="flex items-center gap-3 group">
           <div
-            className="flex items-center justify-center"
+            className="flex items-center justify-center transition-transform duration-200 group-hover:rotate-[-8deg]"
             style={{
-              width: 36,
-              height: 36,
-              background: '#000000',
-              border: '3px solid #000000',
+              width: 32,
+              height: 32,
+              background: '#1A1A1A',
             }}
           >
             <span
-              className="font-display text-2xl leading-none"
-              style={{ color: '#FF3131', transform: 'translateY(-2px)' }}
+              className="font-display text-xl leading-none"
+              style={{ color: '#E76F51', transform: 'translateY(-2px)' }}
             >
               N
             </span>
           </div>
           <span className="font-mono-raw text-sm tracking-tight">
-            neporrex_<span style={{ color: '#FF3131' }}>.</span>dev
+            neporrex_<span style={{ color: '#E76F51' }}>.</span>dev
           </span>
-        </div>
-        <div className="hidden md:flex items-center gap-6">
+        </a>
+        <div className="hidden md:flex items-center gap-1">
           {[
-            { label: 'WORK', href: '#scene-1' },
-            { label: 'GRID', href: '#scene-2' },
-            { label: 'MANIFESTO', href: '#scene-3' },
+            { label: 'WORK', href: '#top' },
+            { label: 'STORM', href: '#storm' },
+            { label: 'MANIFESTO', href: '#manifesto' },
             { label: 'CONTACT', href: '#contact' },
           ].map((link) => (
             <a
               key={link.href}
               href={link.href}
-              className="font-display text-sm tracking-tight hover:bg-black hover:text-[#F2F0E9] px-3 py-1 transition-colors duration-75"
-              style={{ border: '2px solid #000000' }}
+              className="font-mono-raw text-xs tracking-wider px-3 py-1.5 transition-all duration-150 hover:bg-[#1A1A1A] hover:text-[#F5F1E8]"
             >
               {link.label}
             </a>
           ))}
         </div>
         <div
-          className="hidden md:flex items-center gap-2 px-3 py-1"
+          className="flex items-center gap-2 px-2.5 py-1"
           style={{
-            background: '#FF3131',
-            border: '3px solid #000000',
-            boxShadow: '4px 4px 0px 0px #000000',
+            background: '#2A9D8F',
+            border: '2px solid #1A1A1A',
           }}
         >
           <span
-            className="w-2 h-2"
-            style={{ background: '#000000', borderRadius: 0 }}
+            className="w-1.5 h-1.5 animate-flicker"
+            style={{ background: '#1A1A1A' }}
           />
-          <span className="font-mono-raw text-xs font-bold">ONLINE</span>
+          <span className="font-mono-raw text-[10px] font-bold tracking-wider">ONLINE</span>
         </div>
       </div>
+      <div
+        className="h-[2px] w-full origin-left transition-transform duration-500"
+        style={{
+          background: '#E76F51',
+          transform: scrolled ? 'scaleX(1)' : 'scaleX(0)',
+        }}
+      />
     </nav>
   );
 }
